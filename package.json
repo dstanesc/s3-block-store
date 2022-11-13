@@ -1,7 +1,7 @@
 {
   "name": "@dstanesc/s3-block-store",
   "description": "Simple content-addressable storage (CAS) based on AWS S3",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/dstanesc/s3-block-store",
   "repository": "https://github.com/dstanesc/s3-block-store",
   "license": "(Apache-2.0 AND MIT)",

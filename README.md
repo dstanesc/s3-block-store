@@ -1,4 +1,4 @@
-# Azure Block Store
+# S3 Block Store
 
 Simple content-addressable storage (CAS) based on [AWS S3](https://aws.amazon.com/s3/). 
 
