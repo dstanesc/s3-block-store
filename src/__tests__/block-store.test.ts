@@ -27,7 +27,7 @@ test("demo s3 cas usage in the context of @dstanesc/store-chunky-bytes", async (
   // optional cache
   const cache = {};
 
-  // az-block-store api
+  // s3-block-store api
   const { get, put } = blockStore({ /*cache,*/ s3, bucket});
 
   // chunking config
@@ -41,20 +41,30 @@ test("demo s3 cas usage in the context of @dstanesc/store-chunky-bytes", async (
   // chunk the data (content defined)
   const { root, blocks } = await create({ buf, chunk: fastcdc, encode });
 
-  // store the chunks to the az-block-store
+  // store the chunks to the s3-block-store
   for (const block of blocks) {
     console.log(`Save block: ${block.cid} len: ${block.bytes.byteLength}`);
     await put(block);
   }
+  
+  // read back a slice of data from the s3-block-store
+  await readSlice(read, root, decode, get, records);
+  // reading again same blocks should require 0 roundtrips w/ cache on
+  await readSlice(read, root, decode, get, records);
 
-  // read back a slice of data from the az-block-store
+});
+
+async function readSlice(read: (startOffset: number, length: number, { root, index, decode, get }: { root?: any; index?: any; decode: (cidBytes: Uint8Array) => any; get: (cid: any) => Promise<Uint8Array>; }, debugCallback?: Function) => Promise<Uint8Array>, root: any, decode: (cidBytes: Uint8Array) => any, get: (cid: any) => Promise<Uint8Array>, records: any[]) {
+  const startTime = new Date().getTime();
   const retrieved = await retrieve(read, 0, 10, RECORD_SIZE_BYTES, {
     root,
     decode,
     get,
   });
+  const endTime = new Date().getTime();
   console.log(retrieved);
-
+  console.log(`Time ${endTime - startTime}`);
   assert.equal(retrieved.length, 10);
   assert.deepEqual(records.slice(0, 10), retrieved);
-});
+}
+

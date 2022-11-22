@@ -1,6 +1,6 @@
 
 const blockStore = ({ cache, s3, bucket }: { cache?: any, s3: any, bucket: string }) => {
-    
+
     const put = async (block: { cid: any, bytes: Uint8Array }): Promise<void> => {
         if (cache)
             cache[block.cid.toString()] = block.bytes
@@ -27,12 +27,14 @@ const blockStore = ({ cache, s3, bucket }: { cache?: any, s3: any, bucket: strin
                 Bucket: bucket,
                 Key: cid.toString()
             }
-            return new Promise((resolve, reject) => {
+            bytes = await new Promise((resolve, reject) => {
                 s3.getObject(params, (err: any, resp: any) => {
                     if (err) return reject(err)
                     resolve(resp.Body)
                 })
             })
+            if (cache)
+                cache[cid.toString()] = bytes
         }
         return bytes
     }
